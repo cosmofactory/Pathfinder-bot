@@ -1,2 +1,2 @@
 # Pathfinder-bot
-the most hedonistic bot here
+the most hedonistic bot
