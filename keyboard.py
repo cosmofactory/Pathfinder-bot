@@ -18,19 +18,26 @@ request_places_btn_1200 = InlineKeyboardButton(
     '1200 m',
     callback_data='1200'
 )
+try_once_again = InlineKeyboardButton(
+    'Выбрать другой радиус'
+)
+try_once_again_from_start = InlineKeyboardButton(
+    'Начать сначала'
+)
 
 
-start = KeyboardButton('/отправить_свое_местоположение', request_location=True)
+start = KeyboardButton('/send_location', request_location=True)
 
 keyboard_inline = InlineKeyboardMarkup().add(
     request_places_btn_300,
     request_places_btn_600,
     request_places_btn_1200
-    )
+)
 
-
-
-
+keyboard_inline_once_again = InlineKeyboardMarkup().add(
+    try_once_again,
+    try_once_again_from_start
+)
 
 
 keyboard_reply = ReplyKeyboardMarkup(
