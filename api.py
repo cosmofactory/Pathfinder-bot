@@ -1,10 +1,15 @@
 import requests
+import os
+
+from dotenv import load_dotenv
 from pprint import pprint
 
 
+load_dotenv()
 MAX_RESPONSE_RESULTS = 5
 
 
+API_KEY = (('key'), (os.getenv('API_KEY')))
 
 def get_api_answer(radius, location, type):
     """Requests information from google servers.
@@ -12,12 +17,12 @@ def get_api_answer(radius, location, type):
     The function does the following:
     - receives a json from google
     - checks business if operational and has ratings
-    - returns top 5 places sorted by rating
+    - returns top 5 places sorted by rating.
     """
 
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
 
-    API_KEY = (('key'), (''))
+
     payload = (API_KEY, radius, location, type)
     headers = {}
 
