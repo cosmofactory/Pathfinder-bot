@@ -1,8 +1,8 @@
 import requests
 import os
 
+
 from dotenv import load_dotenv
-from pprint import pprint
 
 
 load_dotenv()
@@ -16,13 +16,11 @@ def get_api_answer(radius, location, type):
     
     The function does the following:
     - receives a json from google
-    - checks business if operational and has ratings
+    - checks if business is operational and has ratings
     - returns top 5 places sorted by rating.
     """
 
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
-
-
     payload = (API_KEY, radius, location, type)
     headers = {}
 
@@ -44,15 +42,25 @@ def get_api_answer(radius, location, type):
 
 
 def parse_answer(sorted_response, number):
-    return (
-        sorted_response[number]['name'],
-        sorted_response[number]['rating'],
-        sorted_response[number]['vicinity']
+    expected_information = (
+        'name',
+        'rating',
+        'vicinity',
+        'price_level',
     )
+    expected_return = []
+    for i in expected_information:
+        try:
+            expected_return.append(sorted_response[number][i])
+        except Exception:
+            expected_return.append('Нет данных')
+    return expected_return
 
 
 def send_message(number, sorted_response):
-    name, rating, address = parse_answer(sorted_response, number)
+    name, rating, address, price_level, types = parse_answer(sorted_response, number)
     return(   f'Название: {name}\n'
             f'Рейтинг: {rating}\n'
-            f'Адрес: {address}')
+            f'Адрес: {address}\n'
+            f'Ценовой диапазон: {price_level}\n'
+            )
