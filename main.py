@@ -38,6 +38,7 @@ class Location(StatesGroup):
 async def start(message: types.Message):
     await message.answer(
         'Этот бот поможет найти бар или ресторан рядом с вами.\n'
+        'Вам будет предоставлен список до пяти заведений.\n'
         'Нажмите кнопку "отправить свое местоположение",'
         ' чтобы бот узнал координаты.',
         reply_markup=keyboard.keyboard_reply
@@ -47,7 +48,7 @@ async def start(message: types.Message):
 
 @dp.message_handler(
         content_types=['location'],
-        state=Location.get,
+        state=Location.get
     )
 async def get_location(message: types.Message, state: FSMContext):
     location = (f'{message.location.latitude},{message.location.longitude}')
@@ -70,15 +71,38 @@ async def find_restaurant(
         location = (('location'), (data['location']))
     radius = (('radius'), (callback_query.data))
     sorted_response = api.get_api_answer(radius, location, type)
-    for number in range(0, 5):
-        await callback_query.message.answer(
-            api.send_message(number, sorted_response)
+    try:
+        for number in range(0, 5):
+            await callback_query.message.answer(
+                api.send_message(number, sorted_response)
+                )
+    except IndexError:
+        if number == 0:
+            await callback_query.message.answer(
+                'К сожалению, вы в такой жопе мира,'
+                ' что здесь даже выпить не нальют.'
             )
+        else:
+            await callback_query.message.answer(
+            'К сожалению, в этом радиусе больше заведений нет.'
+        )
     await callback_query.message.answer(
-        'Попробовать еще раз?',
+        'Выбрать другой радиус?',
         reply_markup=keyboard.keyboard_inline_once_again
     )
+    await callback_query.answer()
+
+
+@dp.callback_query_handler(text=['starting'], state='*')
+async def start_from_the_beginning(callback_query: types.CallbackQuery):
+    await callback_query.message.answer(
+        'Отправим свое местоположение еще раз',
+        reply_markup=keyboard.keyboard_reply
+    )
+    await Location.get.set()
+    await callback_query.answer()
 
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
+
