@@ -91,7 +91,8 @@ async def find_restaurant(
     try:
         for number in range(0, 10):
             await callback_query.message.answer(
-                api.send_message(number, sorted_response)
+                api.send_message(number, sorted_response),
+                parse_mode=types.ParseMode.HTML
                 )
     except IndexError as end_of_list:
         logging.error(f'Error {end_of_list}', exc_info=True)
