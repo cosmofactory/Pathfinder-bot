@@ -24,22 +24,26 @@ def get_api_answer(radius, location, type):
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
     payload = (API_KEY, radius, location, type)
     headers = {}
+    try:
+        response = requests.request(
+            "GET", url, headers=headers, params=payload
+        )
 
-    response = requests.request("GET", url, headers=headers, params=payload)
-
-    response = response.json().get('results')
-    filtered_response = []
-    for obj in response:  # Removing closed and no-rating places
-        try:
-            if obj['business_status'] == 'OPERATIONAL' and obj['rating']:
-                filtered_response.append(obj)
-        except Exception:
-            pass
-    return sorted(
-        filtered_response,
-        key=lambda x: x['user_ratings_total'],
-        reverse=True
-    )[:MAX_RESPONSE_RESULTS]
+        response = response.json().get('results')
+        filtered_response = []
+        for obj in response:  # Removing closed and no-rating places
+            try:
+                if obj['business_status'] == 'OPERATIONAL' and obj['rating']:
+                    filtered_response.append(obj)
+            except Exception:
+                pass
+        return sorted(
+            filtered_response,
+            key=lambda x: x['user_ratings_total'],
+            reverse=True
+        )[:MAX_RESPONSE_RESULTS]
+    except Exception:
+        raise requests.ConnectionError('No response from Google servers.')
 
 
 def parse_answer(sorted_response, number):
@@ -77,7 +81,7 @@ def send_message(number, sorted_response):
         f'Количестве отзывов: {total_reviews}\n'
         f'Адрес: {address}\n'
         f'Цены: {PRICE_LEVEL[price_level]}\n'
-        '<a href="{link}{place_id}"> Посмотреть на карте </a>'.format(
+        '<a href="{link}{place_id}">Посмотреть на карте </a>'.format(
             link=link, place_id=place_id
         )
     )
