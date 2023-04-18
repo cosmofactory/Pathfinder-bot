@@ -3,6 +3,8 @@ import os
 import requests
 from dotenv import load_dotenv
 
+from messages import PRICE_LEVEL
+
 load_dotenv()
 MAX_RESPONSE_RESULTS = 10
 
@@ -48,6 +50,7 @@ def parse_answer(sorted_response, number):
         'user_ratings_total',
         'vicinity',
         'price_level',
+        'place_id'
     )
     expected_return = []
     for i in expected_information:
@@ -61,13 +64,20 @@ def parse_answer(sorted_response, number):
 
 def send_message(number, sorted_response):
     """Forms a single message to be sent."""
-    name, rating, total_reviews, address, price_level = parse_answer(
+    name, rating, total_reviews, address, price_level, place_id = parse_answer(
         sorted_response, number
+    )
+    link = (
+        'https://www.google.com/maps/search/'
+        '?api=1&query=%3Caddress%3E&query_place_id='
     )
     return (
         f'Название: {name}\n'
         f'Рейтинг: {rating}\n'
         f'Количестве отзывов: {total_reviews}\n'
         f'Адрес: {address}\n'
-        f'Ценовой диапазон: {price_level}\n'
+        f'Цены: {PRICE_LEVEL[price_level]}\n'
+        '<a href="{link}{place_id}"> Посмотреть на карте </a>'.format(
+            link=link, place_id=place_id
+        )
     )
