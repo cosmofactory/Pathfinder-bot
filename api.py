@@ -4,6 +4,7 @@ import requests
 from dotenv import load_dotenv
 
 from messages import PRICE_LEVEL
+from rating_modifier import rating_modifier
 
 load_dotenv()
 MAX_RESPONSE_RESULTS = 10
@@ -34,12 +35,17 @@ def get_api_answer(radius, location, type):
         for obj in response:  # Removing closed and no-rating places
             try:
                 if obj['business_status'] == 'OPERATIONAL' and obj['rating']:
+                    #  adding new value on which we will sort
+                    obj['rating_modifier'] = rating_modifier(
+                        obj['rating'],
+                        obj['user_ratings_total']
+                    )
                     filtered_response.append(obj)
             except Exception:
                 pass
         return sorted(
             filtered_response,
-            key=lambda x: x['user_ratings_total'],
+            key=lambda x: x['rating_modifier'],
             reverse=True
         )[:MAX_RESPONSE_RESULTS]
     except Exception:
