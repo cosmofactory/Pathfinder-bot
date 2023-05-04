@@ -46,5 +46,5 @@ https://github.com/cosmofactory
 ```
 
 Tech used:
-pythonm, aiogram, requests, dotenv, telegram_bot
+python, aiogram, requests, dotenv, telegram_bot
 
